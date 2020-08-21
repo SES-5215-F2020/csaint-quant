@@ -69,6 +69,8 @@ counties_rural <- get_decennial(geography= "county",
                 variables= rural_vars, 
                 output= "wide", 
                 year = 2010)
+and it l
+
 
 counties2 <- inner_join(counties2018,counties_rural,by = "GEOID") %>% 
   mutate(unemp_civlabor_16 = unemp_civlabor_16E / total_popE,
