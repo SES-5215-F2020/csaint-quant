@@ -1,0 +1,97 @@
+---
+title: "Assignment 1"
+author: "Cat"
+date: "8/13/2020"
+output: html_document
+---
+
+```{r}
+library(tidycensus)
+library(tidyverse)
+census_api_key
+```
+
+## Finding Variables 
+
+### Area-level data (American Community Survey)
+```{r}
+area_vars_2018 <- load_variables(2018, "acs5")
+```
+## Variables used: 
+
+I decided to explore employment trends by census tract on the county level (unit of analysis) in Los Angeles, California. I chose the following variables from ACS-5 year summary 2018. The reason behind this choice is because, according to the ACS/API handbook, estimates for small geographic areas with populations less than 20,000 people are only available for the ACS5 (five-year data).
+https://www.census.gov/content/dam/Census/library/publications/2020/acs/acs_api_handbook_2020.pdf
+
+
+1. Median Age (continuous) : med_age
+
+2. Part of the total population unemployed in civilian labor force (age 16 years and above) (continuous): unemp_labor
+
+3. Part of the total population who are high school graduates (or equivalent) in labor force (continuous): 
+
+4. Majority race of the population (not Hispanic or Latino) (categorical) : maj_race
+
+5. Whether the majority of the population is foreign born or not(categorical): maj_foreign
+
+```{r}
+pop_vars <- c(med_age = "B01002_001",
+              unemp_labor = "B23025_005",
+              hs_grad = "B23006_010", 
+              total_pop = "B02001_001", 
+              white_alone = "B03002_003",
+              black_AA_alone = "B03002_004",
+              hispanic_latino = "B03002_012",
+              native_alone = "B03002_005",
+              asian_alone = "B03002_006",
+              hawaiian_PI_alone = "B03002_007",
+              mult_races = "B03002_009",
+              other = "B03002_008",
+              foreign_born = "B05002_013")
+
+tractLosAngelesCA2018 <- get_acs(geography= "tract", 
+              variables = pop_vars, 
+              output = "wide", 
+              state = "CA",
+              county = "Los Angeles",
+              year = 2018, 
+              survey = "acs5")
+```
+After finding my variables and filtering them to census tracts in Los Angeles county, I want to calculate the percentage of people unemployed in each census tract, and the percentage of people with a highschool degree or equivalent. I also calculate the percentage of the majority foreign born, and set it so that if half the population are foreign born, then the census tract is labeled as true. 
+
+I leave median income as is, as there is nothing to change. I also pull up detailed variables for my race categorical variable and manipulate it so that any tract with a race greater than 50% will be designated as the majority race.  
+```{r}
+tractLosAngelesCA2018 <- tractLosAngelesCA2018 %>%
+  mutate(pct_white = white_aloneE/total_popE,
+         pct_black = black_AA_aloneE/total_popE,
+         pct_hisp_lat = hispanic_latinoE/total_popE,
+         pct_native = native_aloneE/total_popE,
+         pct_asian = asian_aloneE/total_popE,
+         pct_hawaiian_PI = hawaiian_PI_aloneE/total_popE,
+         pct_mult = mult_racesE/total_popE,
+         pct_other = otherE/total_popE,
+         pct_unemp_labor = unemp_laborE / total_popE,
+         pct_hs_grad = hs_gradE / total_popE, 
+         maj_foreign = foreign_bornE / total_popE > 0.5 )%>%
+  
+  mutate(pct_nh_white = pct_white,
+         pct_nh_black = pct_black,
+         pct_nh_asian = pct_asian,
+         pct_other = pct_native + pct_hawaiian_PI + pct_mult + pct_other) %>%
+  
+  mutate(maj_race_tract = case_when(
+    pct_nh_white > 0.5 ~ "nh_white",
+    pct_nh_black > 0.5 ~ "nh_black",
+    pct_hisp_lat > 0.5 ~ "hs_latino",
+    pct_nh_asian > 0.5 ~ "nh_asian",
+    pct_other > 0.5 ~ "other",
+    TRUE ~ "no_majority")) %>%
+  
+  select (maj_foreign, maj_race_tract, pct_unemp_labor, pct_hs_grad, med_ageE)
+  
+```
+Now that I have calculated my variables, I want to select them and create a data frame, which I will then convert to a CSV. 
+```{r}
+tractLosAngelesCA2018
+write_csv(tractLosAngelesCA2018,"tractLosAngelesCA2018.csv")
+
+```
