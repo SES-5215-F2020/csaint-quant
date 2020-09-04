@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Cat" />
+<meta name="author" content="Catherine Saint" />
 
 
 <title>Assignment 1</title>
@@ -331,6 +330,7 @@ summary {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -363,7 +363,7 @@ summary {
 
 
 <h1 class="title toc-ignore">Assignment 1</h1>
-<h4 class="author">Cat</h4>
+<h4 class="author">Catherine Saint</h4>
 <h4 class="date">8/13/2020</h4>
 
 </div>
@@ -371,67 +371,9 @@ summary {
 
 <pre class="r"><code>library(tidycensus)
 library(tidyverse)</code></pre>
-<pre><code>## -- Attaching packages ---------------------------------------------------------------------- tidyverse 1.2.1 --</code></pre>
-<pre><code>## v ggplot2 3.2.1     v purrr   0.3.3
-## v tibble  2.1.3     v dplyr   1.0.0
-## v tidyr   1.0.0     v stringr 1.4.0
-## v readr   1.3.1     v forcats 0.4.0</code></pre>
-<pre><code>## Warning: package &#39;purrr&#39; was built under R version 3.6.3</code></pre>
-<pre><code>## Warning: package &#39;dplyr&#39; was built under R version 3.6.3</code></pre>
-<pre><code>## -- Conflicts ------------------------------------------------------------------------- tidyverse_conflicts() --
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>census_api_key</code></pre>
-<pre><code>## function (key, overwrite = FALSE, install = FALSE) 
-## {
-##     if (install) {
-##         home &lt;- Sys.getenv(&quot;HOME&quot;)
-##         renv &lt;- file.path(home, &quot;.Renviron&quot;)
-##         if (file.exists(renv)) {
-##             file.copy(renv, file.path(home, &quot;.Renviron_backup&quot;))
-##         }
-##         if (!file.exists(renv)) {
-##             file.create(renv)
-##         }
-##         else {
-##             if (isTRUE(overwrite)) {
-##                 message(&quot;Your original .Renviron will be backed up and stored in your R HOME directory if needed.&quot;)
-##                 oldenv = read.table(renv, stringsAsFactors = FALSE)
-##                 newenv &lt;- oldenv[-grep(&quot;CENSUS_API_KEY&quot;, oldenv), 
-##                   ]
-##                 write.table(newenv, renv, quote = FALSE, sep = &quot;\n&quot;, 
-##                   col.names = FALSE, row.names = FALSE)
-##             }
-##             else {
-##                 tv &lt;- readLines(renv)
-##                 if (any(grepl(&quot;CENSUS_API_KEY&quot;, tv))) {
-##                   stop(&quot;A CENSUS_API_KEY already exists. You can overwrite it with the argument overwrite=TRUE&quot;, 
-##                     call. = FALSE)
-##                 }
-##             }
-##         }
-##         keyconcat &lt;- paste0(&quot;CENSUS_API_KEY=&#39;&quot;, key, &quot;&#39;&quot;)
-##         write(keyconcat, renv, sep = &quot;\n&quot;, append = TRUE)
-##         message(&quot;Your API key has been stored in your .Renviron and can be accessed by Sys.getenv(\&quot;CENSUS_API_KEY\&quot;). \nTo use now, restart R or run `readRenviron(\&quot;~/.Renviron\&quot;)`&quot;)
-##         return(key)
-##     }
-##     else {
-##         message(&quot;To install your API key for use in future sessions, run this function with `install = TRUE`.&quot;)
-##         Sys.setenv(CENSUS_API_KEY = key)
-##     }
-## }
-## &lt;bytecode: 0x0000000021606fb0&gt;
-## &lt;environment: namespace:tidycensus&gt;</code></pre>
-<div id="finding-variables" class="section level2">
-<h2>Finding Variables</h2>
-<div id="area-level-data-american-community-survey" class="section level3">
-<h3>Area-level data (American Community Survey)</h3>
-<pre class="r"><code>area_vars_2018 &lt;- load_variables(2018, &quot;acs5&quot;)</code></pre>
-</div>
-</div>
 <div id="variables-used" class="section level2">
 <h2>Variables used:</h2>
-<p>I decided to explore employment trends by census tract on the county level (unit of analysis) in Los Angeles, California. I chose the following variables from ACS-5 year summary 2018. The reason behind this choice is because, according to the ACS/API handbook, estimates for small geographic areas with populations less than 20,000 people are only available for the ACS5 (five-year data). <a href="https://www.census.gov/content/dam/Census/library/publications/2020/acs/acs_api_handbook_2020.pdf" class="uri">https://www.census.gov/content/dam/Census/library/publications/2020/acs/acs_api_handbook_2020.pdf</a></p>
+<p>I decided to explore employment trends at the census tract level in Los Angeles County, California (so my unit of analysis is the census tract). I chose the following variables from ACS-5 year summary 2018. The reason behind this choice is because, according to the ACS/API handbook, estimates for small geographic areas with populations less than 20,000 people are only available for the ACS5 (five-year data). <a href="https://www.census.gov/content/dam/Census/library/publications/2020/acs/acs_api_handbook_2020.pdf" class="uri">https://www.census.gov/content/dam/Census/library/publications/2020/acs/acs_api_handbook_2020.pdf</a></p>
 <ol style="list-style-type: decimal">
 <li><p>Median Age (continuous) : med_age</p></li>
 <li><p>Part of the total population unemployed in civilian labor force (age 16 years and above) (continuous): unemp_labor</p></li>
@@ -439,19 +381,19 @@ library(tidyverse)</code></pre>
 <li><p>Majority race of the population (not Hispanic or Latino) (categorical) : maj_race</p></li>
 <li><p>Whether the majority of the population is foreign born or not(categorical): maj_foreign</p></li>
 </ol>
-<pre class="r"><code>pop_vars &lt;- c(med_age = &quot;B01002_001&quot;,
-              unemp_labor = &quot;B23025_005&quot;,
-              hs_grad = &quot;B23006_010&quot;, 
-              total_pop = &quot;B02001_001&quot;, 
-              white_alone = &quot;B03002_003&quot;,
-              black_AA_alone = &quot;B03002_004&quot;,
-              hispanic_latino = &quot;B03002_012&quot;,
-              native_alone = &quot;B03002_005&quot;,
-              asian_alone = &quot;B03002_006&quot;,
+<pre class="r"><code>pop_vars &lt;- c(med_age =           &quot;B01002_001&quot;,
+              unemp_labor =       &quot;B23025_005&quot;,
+              hs_grad =           &quot;B23006_010&quot;, 
+              total_pop =         &quot;B02001_001&quot;, 
+              white_alone =       &quot;B03002_003&quot;,
+              black_AA_alone =    &quot;B03002_004&quot;,
+              native_alone =      &quot;B03002_005&quot;,
+              asian_alone =       &quot;B03002_006&quot;,
               hawaiian_PI_alone = &quot;B03002_007&quot;,
-              mult_races = &quot;B03002_009&quot;,
-              other = &quot;B03002_008&quot;,
-              foreign_born = &quot;B05002_013&quot;)
+              other =             &quot;B03002_008&quot;,
+              mult_races =        &quot;B03002_009&quot;,
+              hispanic_latino =   &quot;B03002_012&quot;,
+              foreign_born =      &quot;B05002_013&quot;)
 
 tractLosAngelesCA2018 &lt;- get_acs(geography= &quot;tract&quot;, 
               variables = pop_vars, 
@@ -461,7 +403,10 @@ tractLosAngelesCA2018 &lt;- get_acs(geography= &quot;tract&quot;,
               year = 2018, 
               survey = &quot;acs5&quot;)</code></pre>
 <pre><code>## Getting data from the 2014-2018 5-year ACS</code></pre>
-<p>After finding my variables and filtering them to census tracts in Los Angeles county, I want to calculate the percentage of people unemployed in each census tract, and the percentage of people with a highschool degree or equivalent. I also calculate the percentage of the majority foreign born, and set it so that if half the population are foreign born, then the census tract is labeled as true.</p>
+</div>
+<div id="calculating-new-variables" class="section level2">
+<h2>Calculating new variables:</h2>
+<p>After finding my variables and filtering them to census tracts in Los Angeles county, I want to calculate the percentage of people unemployed in each census tract, and the percentage of people with a highschool degree or equivalent. I also calculate the percentage of the population that is foreign born, and create a categorical variable with two categories: “TRUE” if at least half the population are foreign born, and “FALSE” otherwise.</p>
 <p>I leave median income as is, as there is nothing to change. I also pull up detailed variables for my race categorical variable and manipulate it so that any tract with a race greater than 50% will be designated as the majority race.</p>
 <pre class="r"><code>tractLosAngelesCA2018 &lt;- tractLosAngelesCA2018 %&gt;%
   mutate(pct_white = white_aloneE/total_popE,
@@ -475,37 +420,35 @@ tractLosAngelesCA2018 &lt;- get_acs(geography= &quot;tract&quot;,
          pct_unemp_labor = unemp_laborE / total_popE,
          pct_hs_grad = hs_gradE / total_popE, 
          maj_foreign = foreign_bornE / total_popE &gt; 0.5 )%&gt;%
-  
-  mutate(pct_nh_white = pct_white,
-         pct_nh_black = pct_black,
-         pct_nh_asian = pct_asian,
-         pct_other = pct_native + pct_hawaiian_PI + pct_mult + pct_other) %&gt;%
-  
-  mutate(maj_race_tract = case_when(
-    pct_nh_white &gt; 0.5 ~ &quot;nh_white&quot;,
-    pct_nh_black &gt; 0.5 ~ &quot;nh_black&quot;,
-    pct_hisp_lat &gt; 0.5 ~ &quot;hs_latino&quot;,
-    pct_nh_asian &gt; 0.5 ~ &quot;nh_asian&quot;,
-    pct_other &gt; 0.5 ~ &quot;other&quot;,
-    TRUE ~ &quot;no_majority&quot;)) %&gt;%
-  
-  select (maj_foreign, maj_race_tract, pct_unemp_labor, pct_hs_grad, med_ageE)</code></pre>
-<p>Now that I have calculated my variables, I want to select them and create a data frame, which I will then convert to a CSV.</p>
+ mutate(maj_race = case_when(pct_white &gt; 0.5 ~ &quot;nh_white&quot;,
+                             pct_black &gt; 0.5 ~ &quot;nh_black&quot;,
+                             pct_hisp_lat &gt; 0.5 ~ &quot;hs_latino&quot;,
+                             pct_native &gt; 0.5 ~ &quot;native_am&quot;,
+                             pct_asian &gt; 0.5 ~ &quot;nh_asian&quot;,
+                             pct_hawaiian_PI &gt; 0.5 ~ &quot;hawaiian_PI&quot;,
+                             pct_mult &gt; 0.5 ~ &quot;multi&quot;,
+                             pct_other &gt; 0.5 ~ &quot;other_nh&quot;,
+                             TRUE ~ &quot;no_majority&quot;)) %&gt;%
+  select (maj_foreign, maj_race, pct_unemp_labor, 
+          pct_hs_grad, med_ageE)</code></pre>
+<p>Now that I have calculated my variables, I’ll display the first few rows of the data frame.</p>
 <pre class="r"><code>tractLosAngelesCA2018</code></pre>
 <pre><code>## # A tibble: 2,346 x 5
-##    maj_foreign maj_race_tract pct_unemp_labor pct_hs_grad med_ageE
-##    &lt;lgl&gt;       &lt;chr&gt;                    &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;
-##  1 FALSE       nh_black                0.0351      0.0461     42.7
-##  2 FALSE       hs_latino               0.0312      0.0972     38.7
-##  3 FALSE       hs_latino               0.0235      0.106      36.7
-##  4 FALSE       hs_latino               0.0197      0.113      38.8
-##  5 FALSE       hs_latino               0.0369      0.101      40  
-##  6 FALSE       no_majority             0.0286      0.0951     41.7
-##  7 FALSE       no_majority             0.0283      0.105      45.2
-##  8 FALSE       no_majority             0.0297      0.0842     43.2
-##  9 FALSE       no_majority             0.0440      0.0865     44.9
-## 10 FALSE       nh_white                0.0368      0.0792     39.7
+##    maj_foreign maj_race    pct_unemp_labor pct_hs_grad med_ageE
+##    &lt;lgl&gt;       &lt;chr&gt;                 &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;
+##  1 FALSE       nh_black             0.0351      0.0461     42.7
+##  2 FALSE       hs_latino            0.0312      0.0972     38.7
+##  3 FALSE       hs_latino            0.0235      0.106      36.7
+##  4 FALSE       hs_latino            0.0197      0.113      38.8
+##  5 FALSE       hs_latino            0.0369      0.101      40  
+##  6 FALSE       no_majority          0.0286      0.0951     41.7
+##  7 FALSE       no_majority          0.0283      0.105      45.2
+##  8 FALSE       no_majority          0.0297      0.0842     43.2
+##  9 FALSE       no_majority          0.0440      0.0865     44.9
+## 10 FALSE       nh_white             0.0368      0.0792     39.7
 ## # ... with 2,336 more rows</code></pre>
+<p>My final dataset has 2,346 rows, which mean my analysis will include 2,346 census tracts.</p>
+<p>Finally, I’ll save my data as a CSV file so I can use it later.</p>
 <pre class="r"><code>write_csv(tractLosAngelesCA2018,&quot;tractLosAngelesCA2018.csv&quot;)</code></pre>
 </div>
 
