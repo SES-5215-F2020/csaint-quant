@@ -69,7 +69,7 @@ ggplot(tract_data, aes(x = pct_hs_grad)) +
 
 ## Distribution of categorical variables
 
-### Descriptive statistics
+### Descriptive statisticss
 
 ```{r}
 nh_black <- t.test (maj_race == "nh_black")
