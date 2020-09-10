@@ -41,7 +41,7 @@ For each categorical variable in your dataset, calculate the 95-percent confiden
 
 ## Distribution of Continuous Variables
 
-### Descsriptive statistics
+### Descriptive statistics
 
 First I calculate summary statistics.
 
