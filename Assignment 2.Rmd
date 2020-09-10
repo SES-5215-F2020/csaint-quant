@@ -1,0 +1,258 @@
+---
+title: "Assignment 2"
+author: "Catherine Saint"
+date: "8/25/2020"
+output: html_document
+---
+```{r}
+library(tidycensus)
+library(tidyverse)
+library(ggplot2)
+tract_data <- read_csv("tractLosAngelesCA2018.csv")
+attach(tract_data)
+```
+### Assignment Instructions
+
+For each continuous variable in your dataset, calculate the sample mean, the sample standard deviation, the 95-percent confidence interval for the population mean, and the interquartile range. Create a histogram to illustrate the distribution of each variable and describe the distribution in a sentence or two.
+For each categorical variable in your dataset, calculate the 95-percent confidence interval for the proportion of the population in each category. 
+
+#### Reminder of my variables from Assignment 1:
+
+1. Median Age (continuous) : med_ageE
+
+2. Part of the total population unemployed in civilian labor force (age 16 years and above) (continuous): pct_unemp_labor
+
+3. Part of the total population who are high school graduates (or equivalent) in labor force (continuous): pct_hs_grad
+
+4. Majority race of the population (categorical) : maj_race_tract
+
+5. Whether the majority of the population is foreign born or not(categorical): maj_foreign
+
+
+## Distribution of Continuous Variables
+
+1. Median Age: med_ageE
+
+
+```{r}
+summary(med_ageE)
+sd(med_ageE, na.rm = TRUE)
+paste("The sample standard deviation for the median age is",
+      prettyNum(sd(med_ageE, na.rm = TRUE), digits = 3), "years.")
+```
+Notice that I use the code (na.rm = TRUE) throughout to rid my dataset of N/A values. 
+Now that I have the summary data, I want to find the confidence interval. 
+```{r}
+pop_mean <- t.test(med_ageE)
+pop_mean
+paste("The 95-percent confidence interval for the population mean is",
+      prettyNum(pop_mean$conf.int[1], digits = 3), "to",
+      prettyNum(pop_mean$conf.int[2], digits = 3), "years.")
+```
+Now, I want to see the distribution through a histogram. I'm also going to add code that allows me to display the summary statistics calculated above onto the histogram. I changed the digits value from 0 to 3 to display the significant digits. Otherwise, my confidence interval for median age would be rounded to the following: 37 years to 37 years (which is not that helpful).
+```{r}
+hist <- ggplot(tract_data, aes(x = med_ageE)) + geom_histogram()
+hist +
+  theme_bw() +
+  scale_x_continuous(name = "Median Age (years)") + 
+  scale_y_continuous(name = "Number of people in sample") + 
+  annotate ("text", x = 45, y = 250, size = 3, 
+            label = paste ("Population mean (95% confidence):",
+                           prettyNum(pop_mean$conf.int[1], digits = 3),
+                           "to",
+                           prettyNum(pop_mean$conf.int[2], digits = 3),
+                           "years.",
+                           "\nSample mean:",
+                           prettyNum(mean(med_ageE, na.rm = TRUE), digits = 3), "years.",
+                           "\nSample median:",
+                           prettyNum(median(med_ageE, na.rm = TRUE), digits = 3), "years.", 
+                           "\nSample interquartile range:",
+                           prettyNum(quantile(med_ageE, na.rm = TRUE)["25%"], digits = 3),
+                           "to",
+                           prettyNum(quantile(med_ageE, na.rm = TRUE)["75%"], digits = 3),
+                           "years."),
+            hjust = 0, vjust = 1)
+```
+
+```{r}
+
+```
+ 
+From the histogram, I am able to deduce that the distrubution of data is relatively normal, with a slightly positive, right-skew. The median value is less than the corresponding mean value, because there are a greater number of outliers within the older population, slightly affecting the mean value.
+
+Next, I am going to use the same code for my other two continuous variables - a huge advantage of using R is copying and pasting code!
+
+2. Part of the total population unemployed in civilian labor force (age 16 years and above): pct_unemp_labor
+```{r}
+summary(pct_unemp_labor)
+sd(pct_unemp_labor, na.rm = TRUE)
+paste("The sample standard deviation for the unemployment percentage of the total population is",
+      prettyNum(sd(med_ageE, na.rm = TRUE), digits = 3), "percent.")
+```
+
+```{r}
+pop_mean <- t.test(pct_unemp_labor)
+pop_mean
+paste("The 95-percent confidence interval for the population mean is",
+      prettyNum(pop_mean$conf.int[1], digits = 3), "to",
+      prettyNum(pop_mean$conf.int[2], digits = 3), "percent.")
+```
+
+
+```{r}
+hist <- ggplot(tract_data, aes(x = pct_unemp_labor)) + geom_histogram()
+hist +
+  theme_bw() +
+  scale_x_continuous(name = "Unemployment (percent)") + 
+  scale_y_continuous(name = "Number of people in sample") + 
+  annotate ("text", x = 0.075, y = 400, size = 3, 
+            label = paste ("Population mean (95% confidence):",
+                           prettyNum(pop_mean$conf.int[1], digits = 3),
+                           "to",
+                           prettyNum(pop_mean$conf.int[2], digits = 3),
+                           "percent.",
+                           "\nSample mean:",
+                           prettyNum(mean(pct_unemp_labor, na.rm = TRUE), digits = 3), "percent.",
+                           "\nSample median:",
+                           prettyNum(median(pct_unemp_labor, na.rm = TRUE), digits = 3), "percent.", 
+                           "\nSample interquartile range:",
+                           prettyNum(quantile(pct_unemp_labor, na.rm = TRUE)["25%"], digits = 3),
+                           "to",
+                           prettyNum(quantile(pct_unemp_labor, na.rm = TRUE)["75%"], digits = 3),
+                           "percent."),
+            hjust = 0, vjust = 1)
+```
+
+
+The distrubution of unemployment is similar to my Median Age variable in that it is relatively normal, with a slightly positive, right-skew. The median value is less than the corresponding mean value, because there are a greater number of outliers located along our x axis, where unemployment percentage increases. 
+
+
+3. Part of the total population who are high school graduates (or equivalent) in labor force over (age 16 years and above) (continuous): pct_hs_grad
+```{r}
+summary(pct_hs_grad)
+sd(pct_hs_grad, na.rm = TRUE)
+paste("The sample standard deviation for the percent of highschool graduates (as a maximum educational attainment level) in the labor force is",
+      prettyNum(sd(pct_unemp_labor, na.rm = TRUE), digits = 3), "percent.")
+```
+
+
+```{r}
+pop_mean <- t.test(pct_hs_grad)
+pop_mean
+paste("The 95-percent confidence interval for the population mean is",
+      prettyNum(pop_mean$conf.int[1], digits = 3), "to",
+      prettyNum(pop_mean$conf.int[2], digits = 3), "percent.")
+```
+
+
+```{r}
+hist <- ggplot(tract_data, aes(x = pct_hs_grad)) + geom_histogram()
+hist +
+  theme_bw() +
+  scale_x_continuous(name = "Highschool Graduate Attainment Level\n (percent)") + 
+  scale_y_continuous(name = "Number of people in sample") + 
+  annotate ("text", x = 0.3, y = 700, size = 3, 
+            label = paste ("Population mean (95% confidence):",
+                           prettyNum(pop_mean$conf.int[1], digits = 3),
+                           "to",
+                           prettyNum(pop_mean$conf.int[2], digits = 3),
+                           "percent.",
+                           "\nSample mean:",
+                           prettyNum(mean(pct_hs_grad, na.rm = TRUE), digits = 3), "percent.",
+                           "\nSample median:",
+                           prettyNum(median(pct_hs_grad, na.rm = TRUE), digits = 3), "percent.", 
+                           "\nSample interquartile range:",
+                           prettyNum(quantile(pct_hs_grad, na.rm = TRUE)["25%"], digits = 3),
+                           "to",
+                           prettyNum(quantile(pct_hs_grad, na.rm = TRUE)["75%"], digits = 3),
+                           "percent."),
+            hjust = 0, vjust = 1)
+```
+ 
+The data skews negatively to the left. Although there are significant outliers located to the right of the mean and median, there still remains a greater number of observations closer to 0%. This explains why the median value is greater than the mean. 
+
+
+
+## Distribution of Categorical Variables
+
+4. Majority race of the population (categorical) : maj_race_tract
+```{r}
+maj_race <- unique(maj_race_tract)
+maj_race
+```
+```{r}
+nh_black <- t.test (maj_race_tract == maj_race[1])
+hs_latino <- t.test (maj_race_tract == maj_race[2])
+no_majority <- t.test (maj_race_tract == maj_race[3])
+nh_white <- t.test (maj_race_tract == maj_race[4])
+nh_asian <- t.test (maj_race_tract == maj_race[5])
+other <- t.test (maj_race_tract == maj_race[6])
+
+shares <- tibble(MajorityRace = c("Black (not Hispanic/Latino)",
+                            "Hispanic/Latino",
+                            "No Majority",
+                            "White (not Hispanic/Latino)",
+                            "Asian (not Hispanic/Latino)",
+                            "Other"),
+                 `Share` = c(nh_black$estimate,
+                             hs_latino$estimate,
+                             no_majority$estimate,
+                             nh_white$estimate,
+                             nh_asian$estimate,
+                             other$estimate),
+                 Low = c(nh_black$conf.int[1],
+                         hs_latino$conf.int[1],
+                         no_majority$conf.int[1],
+                         nh_white$conf.int[1],
+                         nh_asian$conf.int[1],
+                         other$conf.int[1]),
+                 High = c(nh_black$conf.int[2],
+                         hs_latino$conf.int[2],
+                         no_majority$conf.int[2],
+                         nh_white$conf.int[2],
+                         nh_asian$conf.int[2],
+                         other$conf.int[2]))
+shares
+```
+
+
+```{r}
+ggplot(shares, aes(x = maj_race, y = Share, ymin = Low, ymax = High)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(width = 0.5) +
+  theme_bw() +
+  scale_y_continuous(name = "Share of population (error bars represent\n 95-percent interval)",
+                  breaks = c(0, 0.1, 0.2, 0.3, 0.4, 0.5),
+                  labels = c("0", "10%", "20%", "30%", "40%", "50%"))
+```
+ 
+5. Whether the majority of the population in the tract is foreign born or not(categorical): maj_foreign
+```{r}
+foreign_born <- unique(maj_foreign)
+foreign_born
+```
+
+I can see that there are two possible values (TRUE and FALSE) for my foreign born variable. I conduct a t-test for these two values separately to calculate the confidence interval for them and then organize those results into a dataframe.Then, I illustrate the results in a plot just like the one above. 
+
+```{r}
+true <- t.test(maj_foreign==foreign_born[1])
+true
+false<- t.test(maj_foreign==foreign_born[2])
+false
+table2 <- tibble(foreign_born= c("TRUE","FALSE"), 
+    Foreign =c(true$estimate,false$estimate), 
+    Low =c(true$conf.int[1],false$conf.int[1]), 
+    High =c(true$conf.int[2],false$conf.int[2]))
+table2
+```
+
+```{r}
+ggplot(table2, aes(x= c("Majority foreign born", "Minority foreign born"), 
+                   y= Foreign, ymin= Low, ymax=High)) + 
+                  geom_bar(stat="identity") + 
+                  geom_errorbar(width = 0.5) + 
+  theme_bw() + 
+  scale_y_continuous(name= "Share of population (error bars represent \n 95 percent confidence interval )", 
+                     breaks=c(0,0.1,0.2,0.3,0.4,0.5), 
+                     labels=c("0","10%","20%","30%","40%","50%"))
+```
