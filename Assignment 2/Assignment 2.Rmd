@@ -11,12 +11,12 @@ library(ggplot2)
 tract_data <- read_csv("tractLosAngelesCA2018.csv")
 attach(tract_data)
 ```
-### Instructions
+### Assignment Instructions
 
 For each continuous variable in your dataset, calculate the sample mean, the sample standard deviation, the 95-percent confidence interval for the population mean, and the interquartile range. Create a histogram to illustrate the distribution of each variable and describe the distribution in a sentence or two.
 For each categorical variable in your dataset, calculate the 95-percent confidence interval for the proportion of the population in each category. 
 
-#### Reminder of my variables from Assignment 1
+#### Reminder of my variables from Assignment 1:
 
 1. Median Age (continuous) : med_ageE
 
@@ -24,12 +24,12 @@ For each categorical variable in your dataset, calculate the 95-percent confiden
 
 3. Part of the total population who are high school graduates (or equivalent) in labor force (continuous): pct_hs_grad
 
-4. Majority race of the population (not Hispanic or Latino) (categorical) : maj_race_tract
+4. Majority race of the population (categorical) : maj_race_tract
 
 5. Whether the majority of the population is foreign born or not(categorical): maj_foreign
 
 
-#### Distribution of Continuous Variables
+## Distribution of Continuous Variables
 
 1. Median Age: med_ageE
 
@@ -80,7 +80,7 @@ hist +
  
 From the histogram, I am able to deduce that the distrubution of data is relatively normal, with a slightly positive, right-skew. The median value is less than the corresponding mean value, because there are a greater number of outliers within the older population, slightly affecting the mean value.
 
-Next, I am going to use the same code for my other two continuous variables. 
+Next, I am going to use the same code for my other two continuous variables - a huge advantage of using R is copying and pasting code!
 
 2. Part of the total population unemployed in civilian labor force (age 16 years and above): pct_unemp_labor
 ```{r}
@@ -173,9 +173,9 @@ The data skews negatively to the left. Although there are significant outliers l
 
 
 
-#### Distribution of Categorical Variables
+## Distribution of Categorical Variables
 
-4. Majority race of the population (not Hispanic or Latino) (categorical) : maj_race
+4. Majority race of the population (categorical) : maj_race_tract
 ```{r}
 maj_race <- unique(maj_race_tract)
 maj_race
