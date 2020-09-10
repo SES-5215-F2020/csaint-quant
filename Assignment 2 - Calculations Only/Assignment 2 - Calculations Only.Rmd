@@ -1,0 +1,90 @@
+---
+title: "Assignment 2 - Calculations Only"
+author: "Catherine Saint"
+date: "9/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidycensus)
+library(tidyverse)
+library(ggplot2)
+tract_data <- read_csv("tractLosAngelesCA2018.csv")
+attach(tract_data)
+```
+## Distribution of continuous variables
+
+### Descriptive statistics
+
+```{r}
+age_summary <-  summary(med_ageE)
+age_sd <- sd(med_ageE, na.rm = TRUE)
+age_pop_mean_int <- t.test(med_ageE)
+age_summary
+unemp_summary <- summary(pct_unemp_labor)
+unemp_sd <- sd(pct_unemp_labor, na.rm = TRUE)
+unemp_pop_mean_int <- t.test(pct_unemp_labor)
+unemp_summary
+hs_summary <- summary(pct_hs_grad)
+hs_sd <- sd(pct_hs_grad, na.rm = TRUE)
+hs_pop_mean_int <- t.test(pct_hs_grad)
+hs_summary
+```
+### Histograms
+
+#### Median age
+
+```{r}
+ggplot(tract_data, aes(x = med_ageE)) + 
+  geom_histogram(color = "gray", binwidth = 2) +
+  theme_bw() +
+  scale_x_continuous(name = "Median Age in tract (years)") + 
+  scale_y_continuous(name = "Number of people in sample") 
+```
+#### Unemployment
+
+```{r}
+ggplot(tract_data, aes(x = pct_unemp_labor)) + 
+  geom_histogram(color = "gray", binwidth = 0.005) +
+  theme_bw() +
+  scale_x_continuous(name = "Percent of tract population that is unemployed",
+                     breaks = breaks <- seq(0, 0.2, by = 0.01),
+                     labels = paste(breaks*100, "%", sep = "")) + 
+  scale_y_continuous(name = "Number of people in sample") 
+```
+ 
+ 
+#### Worker education
+
+```{r}
+ggplot(tract_data, aes(x = pct_hs_grad)) + 
+  geom_histogram(color = "gray", binwidth = 0.02) +
+  theme_bw() +
+  scale_x_continuous(name = 
+    "Percent of tract population that are workers with high school diplomas",
+                     breaks = breaks <- seq(0, 1, by = 0.1),
+                     labels = paste(breaks*100, "%", sep = "")) + 
+  scale_y_continuous(name = "Number of people in sample") 
+```
+
+## Distribution of categorical variables
+
+### Descriptive statistics
+
+```{r}
+nh_black <- t.test (maj_race == "nh_black")
+nh_black
+hs_latino <- t.test (maj_race == "hs_latino")
+hs_latino
+no_majority <- t.test (maj_race == "no_majority")
+no_majority
+nh_white <- t.test (maj_race == "nh_white")
+nh_white
+nh_asian <- t.test (maj_race == "nh_asian")
+nh_asian
+
+maj_for_born <- t.test(maj_foreign)
+maj_for_born
+maj_nat_born <- t.test(!maj_foreign)
+maj_nat_born
+```
