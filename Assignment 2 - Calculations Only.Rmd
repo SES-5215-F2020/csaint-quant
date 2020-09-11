@@ -7,19 +7,13 @@ output: html_document
 
 ```{r}
 library(tidyverse)
-
+library(ggplot2)
 ```
-
-
 ```{r}
 tract_data <- read_csv("tractLosAngelesCA2018.csv")
 attach(tract_data)
 tract_data
 ```
-## Distribution of continuous variables
-
-### Descriptive statistics
-
 ```{r}
 age_summary <-  summary(med_ageE)
 age_sd <- sd(med_ageE, na.rm = TRUE)
@@ -34,10 +28,6 @@ hs_sd <- sd(pct_hs_grad, na.rm = TRUE)
 hs_pop_mean_int <- t.test(pct_hs_grad)
 hs_summary
 ```
-### Histograms
-
-#### Median age
-
 ```{r}
 ggplot(tract_data, aes(x = med_ageE)) + 
   geom_histogram(color = "gray", binwidth = 2) +
@@ -45,8 +35,6 @@ ggplot(tract_data, aes(x = med_ageE)) +
   scale_x_continuous(name = "Median Age in tract (years)") + 
   scale_y_continuous(name = "Number of people in sample") 
 ```
-#### Unemployment
-
 ```{r}
 ggplot(tract_data, aes(x = pct_unemp_labor)) + 
   geom_histogram(color = "gray", binwidth = 0.005) +
@@ -56,10 +44,6 @@ ggplot(tract_data, aes(x = pct_unemp_labor)) +
                      labels = paste(breaks*100, "%", sep = "")) + 
   scale_y_continuous(name = "Number of people in sample") 
 ```
- 
- 
-#### Worker education
-
 ```{r}
 ggplot(tract_data, aes(x = pct_hs_grad)) + 
   geom_histogram(color = "gray", binwidth = 0.02) +
@@ -70,11 +54,6 @@ ggplot(tract_data, aes(x = pct_hs_grad)) +
                      labels = paste(breaks*100, "%", sep = "")) + 
   scale_y_continuous(name = "Number of people in sample") 
 ```
-
-## Distribution of categorical variables
-
-### Descriptive statisticss
-
 ```{r}
 nh_black <- t.test(maj_race_tract == "nh_black")
 nh_black
