@@ -1,0 +1,238 @@
+---
+title: "Assignment 2"
+author: "Catherine Saint"
+date: "9/10/2020"
+output: html_document
+---
+## Setup
+
+First, I'll load the two libraries I need for this assignment.
+
+```{r load libraries, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+```
+
+Then, I'll read the dataset I created for Assignment 1 and attach it to the search path so that I can refer to the variables in it without specifying which dataframe they're in.
+
+```{r load and attach data, message=FALSE}
+tract_data <- read_csv("tractLosAngelesCA2018.csv")
+attach(tract_data)
+```
+
+## Assignment Instructions
+
+For each continuous variable in your dataset, calculate the sample mean, the sample standard deviation, the 95-percent confidence interval for the population mean, and the interquartile range. Create a histogram to illustrate the distribution of each variable and describe the distribution in a sentence or two.
+
+For each categorical variable in your dataset, calculate the 95-percent confidence interval for the proportion of the population in each category. 
+
+### List of variables (from Assignment 1):
+
+1. Median Age (continuous) : med_ageE
+
+2. Part of the total population unemployed in civilian labor force (age 16 years and above) (continuous): pct_unemp_labor
+
+3. Part of the total population who are high school graduates (or equivalent) in labor force (continuous): pct_hs_grad
+
+4. Majority race of the population (categorical) : maj_race_tract
+
+5. Whether the majority of the population is foreign born or not(categorical): maj_foreign
+
+
+## Distribution of Continuous Variables
+
+### Descriptive statistics
+
+First I calculate summary statistics.
+
+```{r}
+age_summary <-  summary(med_ageE)
+age_sd <- sd(med_ageE, na.rm = TRUE)
+age_pop_mean_int <- t.test(med_ageE)
+unemp_summary <- summary(pct_unemp_labor)
+unemp_sd <- sd(pct_unemp_labor, na.rm = TRUE)
+unemp_pop_mean_int <- t.test(pct_unemp_labor)
+hs_summary <- summary(pct_hs_grad)
+hs_sd <- sd(pct_hs_grad, na.rm = TRUE)
+hs_pop_mean_int <- t.test(pct_hs_grad)
+```
+
+And display them in a formatted table:
+
+```{r}
+summary_table <- tibble(
+  Statistic = c("Sample mean", 
+                "Median",
+                "Standard deviation",
+                "Interquartile range",
+                "Population mean (95% confidence)"),
+  `Median age (years)` = c(prettyNum(age_summary["Mean"], digits=3),
+                           age_summary["Median"],
+                           prettyNum(age_sd, digits = 3),
+                           paste(age_summary["1st Qu."],"to", 
+                                 age_summary["3rd Qu."]),
+                           paste(prettyNum(age_pop_mean_int$conf.int[1],
+                                           digits=3), "to",
+                                 prettyNum(age_pop_mean_int$conf.int[2],
+                                               digits=3))),
+  `Percent unemployed` = c(paste(prettyNum(unemp_summary["Mean"]*100, 
+                                           digits=3),"%"),
+                           paste(prettyNum(unemp_summary["Median"]*100,
+                                           digits=3),"%"),
+                           paste(prettyNum(unemp_sd*100, digits=3),"%"),
+                           paste(prettyNum(unemp_summary["1st Qu."]*100, 
+                                           digits=3),
+                                 "% to", 
+                                 prettyNum(unemp_summary["3rd Qu."]*100, 
+                                           digits=3), "%"),
+                           paste(prettyNum(unemp_pop_mean_int$conf.int[1]*100,
+                                           digits=3), "% to",
+                                 prettyNum(unemp_pop_mean_int$conf.int[2]*100,
+                                           digits=3), "%")),
+  `Percent high-school graduate workers` =
+    c(paste(prettyNum(hs_summary["Mean"]*100, digits=3),"%"),
+      paste(prettyNum(hs_summary["Median"]*100, digits=3),"%"),
+      paste(prettyNum(hs_sd*100, digits=3),"%"),
+      paste(prettyNum(hs_summary["1st Qu."]*100, digits=3), "% to", 
+            prettyNum(hs_summary["3rd Qu."]*100, digits=3), "%"),
+      paste(prettyNum(hs_pop_mean_int$conf.int[1]*100, digits=3), "% to",
+            prettyNum(hs_pop_mean_int$conf.int[2]*100, digits=3), "%")))
+knitr::kable(summary_table, 
+             caption = "Characteristics of census tracts in Los Angeles County")
+```
+
+### Histograms
+
+Now, I'll create histogram for each of these three distributions. 
+
+#### Median age
+
+```{r}
+ggplot(tract_data, aes(x = med_ageE)) + 
+  geom_histogram(color = "gray", binwidth = 2) +
+  theme_bw() +
+  scale_x_continuous(name = "Median Age in tract (years)") + 
+  scale_y_continuous(name = "Number of people in sample") 
+```
+
+The distribution of age looks relatively normal, with a slight skew to the right. The median value is less than the corresponding mean value, because the outliers are located further out along the x-axis, where age increases. 
+
+#### Unemployment
+
+```{r}
+ggplot(tract_data, aes(x = pct_unemp_labor)) + 
+  geom_histogram(color = "gray", binwidth = 0.005) +
+  theme_bw() +
+  scale_x_continuous(name = "Percent of tract population that is unemployed",
+                     breaks = breaks <- seq(0, 0.2, by = 0.01),
+                     labels = paste(breaks*100, "%", sep = "")) + 
+  scale_y_continuous(name = "Number of people in sample") 
+```
+ 
+The distribution of unemployment is positively skewed with a long tail. Outliers around 20% bring the average of the distribution up, with most of the observations concentrated to the left. 
+
+#### Worker education
+
+```{r}
+ggplot(tract_data, aes(x = pct_hs_grad)) + 
+  geom_histogram(color = "gray", binwidth = 0.02) +
+  theme_bw() +
+  scale_x_continuous(name = 
+    "Percent of tract population that are workers with high school diplomas",
+                     breaks = breaks <- seq(0, 1, by = 0.1),
+                     labels = paste(breaks*100, "%", sep = "")) + 
+  scale_y_continuous(name = "Number of people in sample") 
+```
+
+The data skews negatively to the left. Although there are outliers located to the right of the mean and median, there still remains a greater number of observations closer to 0%, bringing down the average.
+
+## Distribution of Categorical Variables
+
+I'll show two tables, one showing the proportions of each category for each of my categorical variables.
+
+### Race/Ethnicity
+
+First I'll do a t-test for each individual race/ethnicity category.
+
+```{r}
+nh_black <- t.test (maj_race_tract == "nh_black")
+hs_latino <- t.test (maj_race_tract == "hs_latino")
+no_majority <- t.test (maj_race_tract == "no_majority")
+nh_white <- t.test (maj_race_tract == "nh_white")
+nh_asian <- t.test (maj_race_tract == "nh_asian")
+```
+
+Then I'll create a formatted table with proportions and confidence intervals
+
+```{r}
+race_shares <- tibble(`Majority Race` = c("Hispanic/Latino",
+                                  "White (not Hispanic/Latino)",
+                                  "No Majority",
+                                  "Asian (not Hispanic/Latino)",
+                                  "Black (not Hispanic/Latino)"),
+                 `Sample proportion` = c(paste(prettyNum(hs_latino$estimate*100, 
+                                                         digits = 3), "%"),
+                                         paste(prettyNum(nh_white$estimate*100, 
+                                                         digits = 3), "%"),
+                                         paste(prettyNum(no_majority$estimate*100, 
+                                                         digits = 3), "%"),
+                                         paste(prettyNum(nh_asian$estimate*100, 
+                                                         digits = 3), "%"),
+                                         paste(prettyNum(nh_black$estimate*100, 
+                                                         digits = 3), "%")),
+                 `95-percent confidence interval` = c(
+                   paste(prettyNum(hs_latino$conf.int[1]*100, digits=3),
+                         "% to ",
+                         prettyNum(hs_latino$conf.int[2]*100, digits=3),
+                         "%", sep=""),
+                   paste(prettyNum(nh_white$conf.int[1]*100, digits=3),
+                         "% to ",
+                         prettyNum(nh_white$conf.int[2]*100, digits=3),
+                         "%", sep=""),
+                   paste(prettyNum(no_majority$conf.int[1]*100, digits=3),
+                         "% to ",
+                         prettyNum(no_majority$conf.int[2]*100, digits=3),
+                         "%", sep=""),
+                   paste(prettyNum(nh_asian$conf.int[1]*100, digits=3),
+                         "% to ",
+                         prettyNum(nh_asian$conf.int[2]*100, digits=3),
+                         "%", sep=""),
+                   paste(prettyNum(nh_black$conf.int[1]*100, digits=3),
+                         "% to ",
+                         prettyNum(nh_black$conf.int[2]*100, digits=3),
+                         "%", sep="")))
+                   
+                   
+knitr::kable(race_shares, caption = "Census tracts in Los Angeles County")
+```
+
+
+### Nativity
+
+First I'll do a t-test for each individual nativity category.
+
+```{r}
+maj_for_born <- t.test(maj_foreign)
+maj_nat_born <- t.test(!maj_foreign)
+```
+
+Then I'll display the results in a formatted table.
+
+``` {r}
+for_shares <- tibble(`Majority nativity` = c("Native born","Foreign born"), 
+                     `Sample proportion` =
+                       c(paste(prettyNum(maj_nat_born$estimate*100,
+                                         digits = 3), "%"),
+                         paste(prettyNum(maj_for_born$estimate*100,
+                                         digits = 3), "%")), 
+                      `95-percent confidence interval` =  
+                        c(paste(prettyNum(maj_nat_born$conf.int[1]*100,
+                                          digits = 3), "% to ",
+                                prettyNum(maj_nat_born$conf.int[2]*100,
+                                          digits = 3), "%"),
+                         paste(prettyNum(maj_for_born$conf.int[1]*100,
+                                          digits = 3), "% to ",
+                                prettyNum(maj_for_born$conf.int[2]*100,
+                                          digits = 3), "%")))
+knitr::kable(for_shares, caption = "Census tracts in Los Angeles County")
+```
