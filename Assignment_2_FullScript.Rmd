@@ -226,13 +226,13 @@ for_shares <- tibble(`Majority nativity` = c("Native born","Foreign born"),
                          paste(prettyNum(maj_for_born$estimate*100,
                                          digits = 3), "%")), 
                       `95-percent confidence interval` =  
-                        c(paste(prettyNum(maj_nat_born$conf.int[1]*100,
+                        c(paste(prettyNum(maj_nat_born$conf.int[2]*100,
                                           digits = 3), "% to ",
-                                prettyNum(maj_nat_born$conf.int[2]*100,
+                                prettyNum(maj_nat_born$conf.int[1]*100,
                                           digits = 3), "%"),
-                         paste(prettyNum(maj_for_born$conf.int[1]*100,
+                         paste(prettyNum(maj_for_born$conf.int[2]*100,
                                           digits = 3), "% to ",
-                                prettyNum(maj_for_born$conf.int[2]*100,
+                                prettyNum(maj_for_born$conf.int[1]*100,
                                           digits = 3), "%")))
 knitr::kable(for_shares, caption = "Census tracts in Los Angeles County")
 ```
