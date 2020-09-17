@@ -1,0 +1,131 @@
+---
+title: "Assignment 3"
+author: "Catherine Saint"
+date: "9/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+tract_data <- read_csv("tractLosAngelesCA2018.csv")
+```
+
+### Topic Reminder
+
+I want to explore the relationship between age, unemployment, educational attainment, race, and nativity on the census tract level in Los Angeles County. 
+
+## Relationships between age, unemployment, and educational attainment
+
+First, I will test the relationship between my continuous variables - median age, percent unemployed, and percent highschool graduates - by running a correlation test. 
+
+```{r cars}
+correlation1 <- cor.test(tract_data$med_ageE, tract_data$pct_unemp_labor)
+correlation1
+
+correlation2 <- cor.test(tract_data$med_ageE, tract_data$pct_hs_grad)
+correlation2
+
+correlation3 <- cor.test(tract_data$pct_unemp_labor, tract_data$pct_hs_grad)
+correlation3
+```
+
+The following statements can be made by looking at Pearson's r and p-values for the correlation tests above. 
+
+  - median age and unemployment: a weak, but statistically signficant, negative correlation at a 95% confidence level. 
+  
+  - median age and high school graduate: a weak, but statistically significant, negative correlation at a 95% confidence level.
+  
+  - unemployment and highschool Ggraduate: a weak, but statistically significant, positive correlation at a 95% confidence level. 
+  
+  
+I want to  see what these "weaker" relationships look like, so I chose median Age and unemployment to represent on a scatterplot. 
+
+
+```{r}
+ggplot(tract_data, aes(x = pct_unemp_labor, y = med_ageE)) + 
+    geom_point(size = 0.5, alpha = 0.25, position = "jitter") +
+    geom_smooth() +
+    theme_bw() +
+    scale_x_continuous(name = "Unemployment (Percent)") +
+    scale_y_continuous(name = "Median Age",
+                      breaks = seq(0, 105, by = 5), 
+                      labels = paste("",
+                                  prettyNum(seq(0, 105, by = 5),
+                                            big.mark = ","))) 
+```
+
+## Relationship between race and nativity
+
+I use the chi-square test of association to determine whether there is a statistically signficant association between race and nativity. 
+```{r}
+chi_sq <- chisq.test(tract_data$maj_race, tract_data$maj_foreign == "TRUE")
+chi_sq
+chi_sq$observed
+chi_sq$expected
+```
+
+I see that the Native American category violates the chi-square observed table, as it has a value less than 5. However, with a p-value so much less than 0.05, we can assume a statistically significant relationship between race and nativity at a 95% confidence level despite this possible innacuracy. 
+
+## Relationships between race and continuous variables 
+
+I use the anova test to find the relationship between race and my continuous variables: age, unemployment, and educational attainment. 
+
+```{r}
+anova <- aov (med_ageE ~ maj_race, data = tract_data)
+summary(anova)
+
+anova <- aov (pct_hs_grad ~ maj_race, data = tract_data)
+summary(anova)
+
+anova <- aov (pct_unemp_labor ~ maj_race, data = tract_data)
+summary(anova)
+
+```
+
+Difference Check:
+```{r}
+differences <- TukeyHSD(anova)
+as_tibble(cbind(pair = row.names(differences$maj_race),
+                differences$maj_race))
+```
+
+
+There exists a significant association between race and unemployment, race and median age, and race and education attainment level at a 95% confidence level. All p-values fall well below the 0.05 threshold. 
+
+I chose to display the relationship between median age and majority race using a box-plot. 
+```{r}
+ggplot(tract_data, aes(x = maj_race, y = med_ageE)) +
+  geom_boxplot() +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_x_discrete(name = "Majority Race") +
+  scale_y_continuous(name = "Median Age",
+                     breaks = seq(0, 105, by = 5),
+                     labels = paste(prettyNum(seq(0, 105, by = 5), 
+                                              big.mark = ",")))
+```
+
+
+## Relationships between nativity and continuous variables 
+
+I use a two-sample t-test to test the relationship between nativity and my continuous variables: age, unemployment, and educational attainment.
+
+```{r}
+difference1 = t.test(med_ageE ~ maj_foreign == "TRUE", 
+                    data = tract_data)
+difference1
+difference2 = t.test(pct_unemp_labor ~ maj_foreign == "TRUE", 
+                    data = tract_data)
+difference2
+difference3 = t.test(pct_hs_grad ~ maj_foreign == "TRUE", 
+                    data = tract_data)
+difference3
+
+```
+There is no signficant relationship found between nativity and median age at a 95% confidence level. 
+
+There is a significant relationship found between unemployment and nativity at a 95% confidence level; tracts with a majority foreign born population have a higher unemployment percentage. 
+
+There is a strong, significant relationship found between educational attainment and nativity; tracts with a majority foreign born population have a larger percentage of highschool graduate (or equivalent) educational attainment than do majority native born tracts. 
