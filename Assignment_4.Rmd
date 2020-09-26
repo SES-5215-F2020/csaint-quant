@@ -1,0 +1,59 @@
+---
+title: "Assignment 4"
+author: "Catherine Saint"
+date: "9/24/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+tract_data <- read_csv("tractLosAngelesCA20181.csv")
+```
+### Linear Regression Model 
+
+**Dependent Variable**: unemployment percentage
+
+**Independent Variables**: 
+
+*1.* median age
+
+*2.* highschool education (or equivalent) attainment
+
+*3.* majority race
+
+*4.* majority foreign or native born 
+
+
+```{r}
+tract_data <- read_csv("tractLosAngelesCA2018.csv") %>%
+  mutate(maj_race = case_when(
+    maj_race=="hs_latino" ~ "-Hispanic/Latino", 
+    maj_race=="nh_black" ~ "Black not Hispanic/Latino",
+    maj_race=="nh_white" ~ "White not Hispanic/Latino",
+    maj_race=="nh_asian" ~ "Asian not Hispanic/Latino",
+    maj_race=="native_am" ~ "Native American",
+    maj_race=="no_majority" ~ "No Majority"))
+```
+
+```{r}
+model <- lm(pct_unemp_labor ~ med_ageE + pct_hs_grad + maj_race + maj_foreign, 
+            data = tract_data)
+summary(model)
+```
+
+### Linear Regression Interpretation
+
+With an adjusted R Square value of .127, these variables explain 13% of the  variation in unemployment percentage (the total portion of the population unemployed in civilian labor force age 16 years and above). Important to note, however, is that not all of these relationships are statistically significant. According to the linear regression model, median age, nativity, and some categories within our race variable have a statistically significant relationship in predicting unemployment, though to varying influence.  
+
+Median Age has an inverse relationship with our dependent variable, meaning that as the median age increases, the proportion of the total population that is unemployed decreases. For every one year increase in the census tract's median age, the value of `pct_unemp_labor` decreases by 0.00097, which corresponds to about one one-hundredth of a percentage point. This difference is modest, but statistically significant at a 95% confidence level.
+
+The proportion of the total population that is unemployed is an average of 0.38 percentage points higher in majority-foreign-born census tracts than in majority-native-born census tracts, controlling for other variables, and this difference is significant at a 95% confidence level.
+
+With a p-value of 0.18, the proportion of the population that are  high school graduates is not a statistically significant predictor when controlling for other variables. This is in contrast to with my correlation findings from Assignment 3, where the correlation between unemployment and  high school attainment was modest (0.07), but statistically significant (p = 0.0006).  
+
+With Hispanic/Latino as our base case, we can see that on average, unemployment is 2 percentage points higher in census tracts that are majority Black than census tracts with majority population Hispanic/Latino. Similarly, the unemployed percentage is 0.5 percentage points higher in census tracts that are majority White than in those that are majority Hispanic/Latino. Tracts with no majority racial/ethnic group and those that are majority Asian do not have significantly different proportions of the population unemployed than those that are majority Hispanic.
+
+```{r}
+
+```
